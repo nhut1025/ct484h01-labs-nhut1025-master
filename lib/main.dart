@@ -1,4 +1,8 @@
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
+import 'ui/products/products_manager.dart';
+import 'ui/products/product_detail_screen.dart';
+
 
 void main() {
   runApp(const MyApp());
@@ -24,6 +28,10 @@ class MyApp extends StatelessWidget {
         foregroundColor: colorScheme.onPrimary,
         shadowColor: colorScheme.shadow,
         elevation: 4,
+        systemOverlayStyle: SystemUiOverlayStyle(
+      statusBarColor: Colors.black,         
+      statusBarIconBrightness: Brightness.light,
+    ),
       ),
     );
 
@@ -31,13 +39,8 @@ class MyApp extends StatelessWidget {
       title: 'MyShop',
       debugShowCheckedModeBanner: false,
       theme: themeData,
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('MyShop'),
-        ),
-        body: const Center(
-          child: Text('Welcome to MyShop'),
-        ),
+      home: ProductDetailScreen(
+        ProductsManager().items[0],
       ),
     );
   }
