@@ -2,7 +2,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'ui/products/products_manager.dart';
 import 'ui/products/product_detail_screen.dart';
-
+import 'ui/products/products_overview_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -39,9 +39,7 @@ class MyApp extends StatelessWidget {
       title: 'MyShop',
       debugShowCheckedModeBanner: false,
       theme: themeData,
-      home: ProductDetailScreen(
-        ProductsManager().items[0],
-      ),
+      home: const ProductsOverviewScreen(),
     );
   }
 }
