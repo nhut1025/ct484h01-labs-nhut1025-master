@@ -5,6 +5,8 @@ class Product {
   final double price;
   final String imageUrl;
   final bool isFavorite;
+  final List<String> availableColors;
+  final List<String> availableSizes;
 
   Product({
     this.id,
@@ -13,6 +15,8 @@ class Product {
     required this.price,
     required this.imageUrl,
     this.isFavorite = false,
+    this.availableColors = const ['Black', 'White', 'Red'],
+    this.availableSizes = const ['S', 'M', 'L'],
   });
 
   Product copyWith({
@@ -22,6 +26,8 @@ class Product {
     double? price,
     String? imageUrl,
     bool? isFavorite,
+    List<String>? availableColors,
+    List<String>? availableSizes,
   }) {
     return Product(
       id: id ?? this.id,
@@ -30,6 +36,8 @@ class Product {
       price: price ?? this.price,
       imageUrl: imageUrl ?? this.imageUrl,
       isFavorite: isFavorite ?? this.isFavorite,
+      availableColors: availableColors ?? this.availableColors,
+      availableSizes: availableSizes ?? this.availableSizes,
     );
   }
 }

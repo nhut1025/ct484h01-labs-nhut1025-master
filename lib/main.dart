@@ -1,9 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
-import 'ui/products/products_manager.dart';
-import 'ui/products/product_detail_screen.dart';
 import 'ui/products/products_overview_screen.dart';
-import 'ui/products/user_products_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -30,9 +27,9 @@ class MyApp extends StatelessWidget {
         shadowColor: colorScheme.shadow,
         elevation: 4,
         systemOverlayStyle: SystemUiOverlayStyle(
-      statusBarColor: Colors.black,         
-      statusBarIconBrightness: Brightness.light,
-    ),
+          statusBarColor: Colors.black,
+          statusBarIconBrightness: Brightness.light,
+        ),
       ),
     );
 
@@ -40,7 +37,7 @@ class MyApp extends StatelessWidget {
       title: 'MyShop',
       debugShowCheckedModeBanner: false,
       theme: themeData,
-      home: const UserProductsScreen(),
+      home: const ProductsOverviewScreen(),
     );
   }
 }
