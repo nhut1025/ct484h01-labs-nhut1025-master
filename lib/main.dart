@@ -1,6 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
-import 'ui/products/products_overview_screen.dart';
+import 'ui/cart/cart_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -31,13 +31,25 @@ class MyApp extends StatelessWidget {
           statusBarIconBrightness: Brightness.light,
         ),
       ),
+
+      dialogTheme: DialogThemeData(
+        titleTextStyle: TextStyle(
+          color: colorScheme.onSurface,
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+        ),
+        contentTextStyle: TextStyle(
+          color: colorScheme.onSurface,
+          fontSize: 20,
+        ),
+      ),
     );
 
     return MaterialApp(
       title: 'MyShop',
       debugShowCheckedModeBanner: false,
       theme: themeData,
-      home: const ProductsOverviewScreen(),
+      home: const CartScreen(),
     );
   }
 }
