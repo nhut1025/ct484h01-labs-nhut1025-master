@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../models/product.dart';
-import 'product_detail_screen.dart';
 import 'package:go_router/go_router.dart';
 
 class ProductGridTile extends StatelessWidget {
