@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../models/product.dart';
 import 'product_detail_screen.dart';
+import 'package:go_router/go_router.dart';
 
 class ProductGridTile extends StatelessWidget {
   const ProductGridTile(
@@ -24,15 +25,11 @@ class ProductGridTile extends StatelessWidget {
             print('Add item to cart');
           },
         ),
-        child: GestureDetector(          // ✅ Thêm GestureDetector
+        child: GestureDetector(          
           onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (ctx) => ProductDetailScreen(product),
-              ),
-            );
+            context.push('/products/${product.id}');
           },
-          child: Image.network(          // ✅ Thay Container() bằng ảnh
+          child: Image.network(         
             product.imageUrl,
             fit: BoxFit.cover,
             errorBuilder: (context, error, stackTrace) {

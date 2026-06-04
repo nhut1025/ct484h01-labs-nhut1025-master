@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
-import 'ui/orders/orders_screen.dart';
+import 'package:go_router/go_router.dart';
+import 'ui/screens.dart';
 
 void main() {
   runApp(const MyApp());
@@ -45,11 +46,46 @@ class MyApp extends StatelessWidget {
       ),
     );
 
-    return MaterialApp(
-      title: 'MyShop',
-      debugShowCheckedModeBanner: false,
+    final router = GoRouter(
+  debugLogDiagnostics: true,
+  initialLocation: '/products',
+  routes: [
+    GoRoute(
+      path: '/products',
+      builder: (context, state) =>
+          const ProductsOverviewScreen(),
+    ),
+    GoRoute(
+      path: '/products/:productId',
+      builder: (context, state) {
+        final productId = state.pathParameters['productId']!;
+        final product = ProductsManager().findById(
+          productId,
+        )!;
+        return ProductDetailScreen(product);
+      },
+    ),
+    GoRoute(
+      path: '/cart',
+      builder: (context, state) => const CartScreen(),
+    ),
+    GoRoute(
+      path: '/orders',
+      builder: (context, state) => const OrdersScreen(),
+    ),
+    GoRoute(
+      path: '/my-products',
+      builder: (context, state) =>
+          const UserProductsScreen(),
+    ),
+  ],
+);
+
+return MaterialApp.router(
+  title: 'My Shop',
+  debugShowCheckedModeBanner: false,
       theme: themeData,
-      home: const OrdersScreen(),
+      routerConfig: router,
     );
   }
 }
