@@ -5,6 +5,8 @@ import '../../widgets/product_add_to_cart_button.dart';
 import '../../widgets/product_color_selector.dart';
 import '../../widgets/product_quantity_selector.dart';
 import '../../widgets/product_size_selector.dart';
+import '../cart/cart_screen.dart';
+import 'products_overview_screen.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   const ProductDetailScreen(
@@ -54,9 +56,45 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       child: Text(
         title,
         style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
+          fontWeight: FontWeight.w600,
+        ),
       ),
+    );
+  }
+
+  PageRouteBuilder _buildPageRoute(Widget page) {
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) => page,
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        final curvedAnimation = CurvedAnimation(
+          parent: animation,
+          curve: Curves.easeInOutCubic,
+        );
+
+        return SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(1.0, 0.0),
+            end: Offset.zero,
+          ).animate(curvedAnimation),
+          child: FadeTransition(
+            opacity: curvedAnimation,
+            child: child,
+          ),
+        );
+      },
+    );
+  }
+
+  void _navigateHome() {
+    Navigator.of(context).pushAndRemoveUntil(
+      _buildPageRoute(const ProductsOverviewScreen()),
+      (route) => false,
+    );
+  }
+
+  void _navigateCart() {
+    Navigator.of(context).push(
+      _buildPageRoute(const CartScreen()),
     );
   }
 
@@ -68,6 +106,16 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       appBar: AppBar(
         title: Text(product.title),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.home),
+            onPressed: _navigateHome,
+            tooltip: 'Trang chủ',
+          ),
+          IconButton(
+            icon: const Icon(Icons.shopping_cart),
+            onPressed: _navigateCart,
+            tooltip: 'Giỏ hàng',
+          ),
           IconButton(
             icon: Icon(
               _isFavorite ? Icons.favorite : Icons.favorite_border,
@@ -169,7 +217,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: ProductQuantitySelector(
                 quantity: _quantity,
-                selectedSummary: 'Màu: ${_selectedColor ?? '-'} • Size: ${_selectedSize ?? '-'}',
+                selectedSummary:
+                    'Màu: ${_selectedColor ?? '-'} • Size: ${_selectedSize ?? '-'}',
                 onDecrement: () => _updateQuantity(-1),
                 onIncrement: () => _updateQuantity(1),
               ),
@@ -181,7 +230,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 onPressed: () {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text('Đã thêm sản phẩm vào giỏ hàng (chỉ demo giao diện).'),
+                      content: Text(
+                        'Đã thêm sản phẩm vào giỏ hàng (chỉ demo giao diện).',
+                      ),
                     ),
                   );
                 },
