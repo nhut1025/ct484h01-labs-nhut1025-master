@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'ui/screens.dart';
 
 void main() {
@@ -59,10 +60,10 @@ class MyApp extends StatelessWidget {
       path: '/products/:productId',
       builder: (context, state) {
         final productId = state.pathParameters['productId']!;
-        final product = ProductsManager().findById(
+        final product = context.read<ProductsManager>().findById(
           productId,
         )!;
-        return ProductDetailScreen(product);
+        return SafeArea(child: ProductDetailScreen(product));
       },
     ),
     GoRoute(
@@ -81,11 +82,16 @@ class MyApp extends StatelessWidget {
   ],
 );
 
-return MaterialApp.router(
-  title: 'My Shop',
-  debugShowCheckedModeBanner: false,
-      theme: themeData,
-      routerConfig: router,
-    );
+return MultiProvider(
+  providers: [
+    ChangeNotifierProvider(create: (_) => ProductsManager()),
+  ],
+  child: MaterialApp.router(
+    title: 'My Shop',
+    debugShowCheckedModeBanner: false,
+    theme: themeData,
+    routerConfig: router,
+  ),
+);
   }
 }
