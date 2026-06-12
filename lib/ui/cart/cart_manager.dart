@@ -1,7 +1,10 @@
-import '../../../models/cart_item.dart';
+import 'package:flutter/foundation.dart';
 
-class CartManager {
-  final Map<String, CartItem> _items = {
+import '../../../models/cart_item.dart';
+import '../../../models/product.dart';
+
+class CartManager with ChangeNotifier {
+  Map<String, CartItem> _items = {
     'p1': CartItem(
       id: 'c1',
       title: 'Red Shirt',
@@ -25,9 +28,64 @@ class CartManager {
 
   double get totalAmount {
     var total = 0.0;
-    _items.forEach((key, cartItem) {
+    _items.forEach((_, cartItem) {
       total += cartItem.price * cartItem.quantity;
     });
     return total;
+  }
+
+  void addItem(Product product) {
+    if (product.id == null) {
+      return;
+    }
+
+    if (_items.containsKey(product.id)) {
+      _items.update(
+        product.id!,
+        (existingCartItem) => existingCartItem.copyWith(
+          quantity: existingCartItem.quantity + 1,
+        ),
+      );
+    } else {
+      _items.putIfAbsent(
+        product.id!,
+        () => CartItem(
+          id: 'c${DateTime.now().toIso8601String()}',
+          title: product.title,
+          imageUrl: product.imageUrl,
+          price: product.price,
+          quantity: 1,
+        ),
+      );
+    }
+    notifyListeners();
+  }
+
+  void removeItem(String productId) {
+    if (!_items.containsKey(productId)) {
+      return;
+    }
+
+    if (_items[productId]!.quantity > 1) {
+      _items.update(
+        productId,
+        (existingCartItem) => existingCartItem.copyWith(
+          quantity: existingCartItem.quantity - 1,
+        ),
+      );
+    } else {
+      _items.remove(productId);
+    }
+    notifyListeners();
+  }
+
+  void clearItem(String productId) {
+    _items.remove(productId);
+    notifyListeners();
+  }
+
+  void clearAllItems() {
+    _items = {};
+    notifyListeners();
   }
 }

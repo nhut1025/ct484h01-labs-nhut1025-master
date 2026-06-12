@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import '../cart/cart_manager.dart';
 import '../shared/app_drawer.dart';
 import 'products_grid.dart';
@@ -83,14 +84,18 @@ class ShoppingCartButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-      icon: Badge.count(
-        count: CartManager().productCount,
-        child: const Icon(
-          Icons.shopping_cart,
-        ),
-      ),
-      onPressed: onPressed,
+    return Consumer<CartManager>(
+      builder: (_, cartManager, __) {
+        return IconButton(
+          icon: Badge.count(
+            count: cartManager.productCount,
+            child: const Icon(
+              Icons.shopping_cart,
+            ),
+          ),
+          onPressed: onPressed,
+        );
+      },
     );
   }
 }
