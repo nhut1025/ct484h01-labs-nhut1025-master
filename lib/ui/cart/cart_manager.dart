@@ -34,8 +34,8 @@ class CartManager with ChangeNotifier {
     return total;
   }
 
-  void addItem(Product product) {
-    if (product.id == null) {
+  void addItem(Product product, {int quantity = 1}) {
+    if (product.id == null || quantity <= 0) {
       return;
     }
 
@@ -43,7 +43,7 @@ class CartManager with ChangeNotifier {
       _items.update(
         product.id!,
         (existingCartItem) => existingCartItem.copyWith(
-          quantity: existingCartItem.quantity + 1,
+          quantity: existingCartItem.quantity + quantity,
         ),
       );
     } else {
@@ -54,7 +54,7 @@ class CartManager with ChangeNotifier {
           title: product.title,
           imageUrl: product.imageUrl,
           price: product.price,
-          quantity: 1,
+          quantity: quantity,
         ),
       );
     }
