@@ -81,6 +81,20 @@ class MyApp extends StatelessWidget {
       builder: (context, state) =>
           const UserProductsScreen(),
     ),
+    GoRoute(
+      path: '/my-products/new',
+      builder: (context, state) => SafeArea(child: EditProductScreen(null)),
+    ),
+    GoRoute(
+      path: '/my-products/:productId/edit',
+      builder: (context, state) {
+        final productId = state.pathParameters['productId'];
+        final product = productId != null
+            ? context.read<ProductsManager>().findById(productId)
+            : null;
+        return SafeArea(child: EditProductScreen(product));
+      },
+    ),
   ],
 );
 
