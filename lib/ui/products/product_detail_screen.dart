@@ -335,7 +335,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                     'Đã thêm $_quantity sản phẩm vào giỏ hàng.',
                                   ),
                                   duration: const Duration(seconds: 2),
-                                  
                                 ),
                               );
                           },

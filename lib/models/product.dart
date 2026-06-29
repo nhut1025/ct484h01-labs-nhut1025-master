@@ -1,8 +1,11 @@
+import 'dart:io';
+
 class Product {
   final String? id;
   final String title;
   final String description;
   final double price;
+  final File? featuredImage;
   final String imageUrl;
   final bool isFavorite;
   final List<String> availableColors;
@@ -13,7 +16,8 @@ class Product {
     required this.title,
     required this.description,
     required this.price,
-    required this.imageUrl,
+    this.featuredImage,
+    this.imageUrl = '',
     this.isFavorite = false,
     this.availableColors = const ['Black', 'White', 'Red'],
     this.availableSizes = const ['S', 'M', 'L'],
@@ -24,6 +28,7 @@ class Product {
     String? title,
     String? description,
     double? price,
+    File? featuredImage,
     String? imageUrl,
     bool? isFavorite,
     List<String>? availableColors,
@@ -34,10 +39,35 @@ class Product {
       title: title ?? this.title,
       description: description ?? this.description,
       price: price ?? this.price,
+      featuredImage: featuredImage ?? this.featuredImage,
       imageUrl: imageUrl ?? this.imageUrl,
       isFavorite: isFavorite ?? this.isFavorite,
       availableColors: availableColors ?? this.availableColors,
       availableSizes: availableSizes ?? this.availableSizes,
+    );
+  }
+
+  bool hasFeaturedImage() {
+    return featuredImage != null || imageUrl.isNotEmpty;
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'title': title,
+      'description': description,
+      'price': price,
+      'isFavorite': isFavorite,
+    };
+  }
+
+  factory Product.fromJson(Map<String, dynamic> json) {
+    return Product(
+      id: json['id'],
+      title: json['title'],
+      description: json['description'],
+      price: json['price'],
+      isFavorite: json['isFavorite'] ?? false,
+      imageUrl: json['imageUrl'] ?? '',
     );
   }
 }
