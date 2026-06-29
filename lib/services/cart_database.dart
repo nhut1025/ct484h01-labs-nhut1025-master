@@ -35,7 +35,7 @@ class CartDatabase {
     return _db!;
   }
 
-  // Lấy toàn bộ cart của 1 user, trả về Map<productId, CartItem>
+
   static Future<Map<String, CartItem>> getItems(String userId) async {
     final db = await _getDatabase();
     final rows = await db.query(
@@ -57,7 +57,6 @@ class CartDatabase {
     return items;
   }
 
-  // Thêm hoặc cập nhật 1 item (upsert theo user_id + product_id)
   static Future<void> upsertItem(
     String userId,
     String productId,
