@@ -147,8 +147,29 @@ class MyApp extends StatelessWidget {
           value: authManager,
         ), // (5) Provide auth manager
         ChangeNotifierProvider(create: (context) => ProductsManager()),
-        ChangeNotifierProvider(create: (context) => OrdersManager()),
-        ChangeNotifierProvider(create: (context) => CartManager()),
+
+        // (6) CartManager: tự load/đổi cart (SQLite) mỗi khi user đổi
+        ChangeNotifierProxyProvider<AuthManager, CartManager>(
+          create: (context) => CartManager(),
+          update: (context, authManager, cartManager) {
+            final manager = cartManager ?? CartManager();
+            manager.setUser(authManager.user?.id);
+            return manager;
+          },
+        ),
+
+        // (7) OrdersManager: tự load/xóa danh sách order (PocketBase) mỗi khi user đổi
+        ChangeNotifierProxyProvider<AuthManager, OrdersManager>(
+          create: (context) => OrdersManager(),
+          update: (context, authManager, ordersManager) {
+            final manager = ordersManager ?? OrdersManager();
+            manager.onAuthUserChanged(
+              authManager.user?.id,
+              authManager.isAuth,
+            );
+            return manager;
+          },
+        ),
       ],
       child: MaterialApp.router(
         title: 'My Shop',

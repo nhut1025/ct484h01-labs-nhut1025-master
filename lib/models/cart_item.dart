@@ -1,3 +1,5 @@
+import 'product.dart';
+
 class CartItem {
   final String id;
   final String title;
@@ -26,6 +28,17 @@ class CartItem {
       imageUrl: imageUrl ?? this.imageUrl,
       quantity: quantity ?? this.quantity,
       price: price ?? this.price,
+    );
+  }
+
+  // Chuyển đổi về Product để dùng cho hàm addItem của CartManager
+  Product toProduct(String productId) {
+    return Product(
+      id: productId,
+      title: title,
+      price: price,
+      description: '', // Không cần thiết cho logic giỏ hàng
+      imageUrl: imageUrl,
     );
   }
 }

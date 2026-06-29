@@ -17,10 +17,23 @@ class OrdersScreen extends StatelessWidget {
       drawer: const AppDrawer(),
       body: Consumer<OrdersManager>(
         builder: (_, ordersManager, __) {
-          return ListView.builder(
-            itemCount: ordersManager.orderCount,
-            itemBuilder: (ctx, i) => OrderItemCard(
-              ordersManager.orders[i],
+          if (ordersManager.isLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (ordersManager.orderCount == 0) {
+            return const Center(
+              child: Text('You have no orders yet.'),
+            );
+          }
+
+          return RefreshIndicator(
+            onRefresh: ordersManager.fetchOrders,
+            child: ListView.builder(
+              itemCount: ordersManager.orderCount,
+              itemBuilder: (ctx, i) => OrderItemCard(
+                ordersManager.orders[i],
+              ),
             ),
           );
         },

@@ -1,18 +1,12 @@
 import 'package:flutter/foundation.dart';
 
-import '../../../models/cart_item.dart';
-import '../../../models/product.dart';
+import '../../models/cart_item.dart';
+import '../../models/product.dart';
+import '../../services/cart_database.dart';
 
 class CartManager with ChangeNotifier {
-  Map<String, CartItem> _items = {
-    'p1': CartItem(
-      id: 'c1',
-      title: 'Red Shirt',
-      imageUrl: 'https://i.postimg.cc/sDz0q0d9/red-t-shirt-1710578-1280.jpg',
-      price: 29.99,
-      quantity: 2,
-    ),
-  };
+  String? _userId;
+  Map<String, CartItem> _items = {};
 
   int get productCount {
     return _items.length;
@@ -34,58 +28,84 @@ class CartManager with ChangeNotifier {
     return total;
   }
 
-  void addItem(Product product, {int quantity = 1}) {
-    if (product.id == null || quantity <= 0) {
-      return;
-    }
+  // Gọi khi user login/logout hoặc đổi user, để load đúng cart từ SQLite
+  Future<void> setUser(String? userId) async {
+    if (_userId == userId) return; // tránh load lại không cần thiết
+    _userId = userId;
 
-    if (_items.containsKey(product.id)) {
-      _items.update(
-        product.id!,
-        (existingCartItem) => existingCartItem.copyWith(
-          quantity: existingCartItem.quantity + quantity,
-        ),
-      );
+    if (userId == null) {
+      _items = {};
     } else {
-      _items.putIfAbsent(
-        product.id!,
-        () => CartItem(
-          id: 'c${DateTime.now().toIso8601String()}',
-          title: product.title,
-          imageUrl: product.imageUrl,
-          price: product.price,
-          quantity: quantity,
-        ),
-      );
+      _items = await CartDatabase.getItems(userId);
     }
     notifyListeners();
   }
 
-  void removeItem(String productId) {
-    if (!_items.containsKey(productId)) {
+  Future<void> addItem(Product product, {int quantity = 1}) async {
+    if (product.id == null || quantity <= 0 || _userId == null) {
       return;
     }
+
+    final userId = _userId!;
+    final productId = product.id!;
+
+    if (_items.containsKey(productId)) {
+      final updated = _items[productId]!.copyWith(
+        quantity: _items[productId]!.quantity + quantity,
+      );
+      _items[productId] = updated;
+      await CartDatabase.upsertItem(userId, productId, updated);
+    } else {
+      final newItem = CartItem(
+        id: 'c${DateTime.now().toIso8601String()}',
+        title: product.title,
+        imageUrl: product.imageUrl,
+        price: product.price,
+        quantity: quantity,
+      );
+      _items[productId] = newItem;
+      await CartDatabase.upsertItem(userId, productId, newItem);
+    }
+    notifyListeners();
+  }
+
+  Future<void> removeItem(String productId) async {
+    if (!_items.containsKey(productId) || _userId == null) {
+      return;
+    }
+
+    final userId = _userId!;
 
     if (_items[productId]!.quantity > 1) {
-      _items.update(
-        productId,
-        (existingCartItem) => existingCartItem.copyWith(
-          quantity: existingCartItem.quantity - 1,
-        ),
+      final updated = _items[productId]!.copyWith(
+        quantity: _items[productId]!.quantity - 1,
       );
+      _items[productId] = updated;
+      await CartDatabase.upsertItem(userId, productId, updated);
     } else {
       _items.remove(productId);
+      await CartDatabase.deleteItem(userId, productId);
     }
     notifyListeners();
   }
 
-  void clearItem(String productId) {
+  Future<void> clearItem(String productId) async {
+    if (_userId == null) return;
+
     _items.remove(productId);
+    await CartDatabase.deleteItem(_userId!, productId);
     notifyListeners();
   }
 
-  void clearAllItems() {
+  Future<void> clearAllItems() async {
+    if (_userId == null) return;
+
     _items = {};
+    await CartDatabase.clearAll(_userId!);
     notifyListeners();
+  }
+
+  Future<void> clear() async {
+    await clearAllItems();
   }
 }

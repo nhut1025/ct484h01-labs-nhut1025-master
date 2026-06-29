@@ -24,10 +24,10 @@ class CartScreen extends StatelessWidget {
                 ? null
                 : () {
                     context.read<OrdersManager>().addOrder(
-                          cart.products,
-                          cart.totalAmount,
-                        );
-                    cart.clearAllItems();
+                      cart.products,
+                      cart.totalAmount,
+                    );
+                    cart.clear();
                   },
           ),
           const SizedBox(height: 10),
@@ -102,7 +102,7 @@ class CartSummary extends StatelessWidget {
                 ),
               ),
               child: const Text('ORDER NOW'),
-            )
+            ),
           ],
         ),
       ),

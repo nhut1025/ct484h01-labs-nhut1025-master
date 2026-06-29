@@ -2,44 +2,62 @@ import 'package:flutter/foundation.dart';
 
 import '../../models/cart_item.dart';
 import '../../models/order_item.dart';
+import '../../services/orders_service.dart';
 
 class OrdersManager with ChangeNotifier {
-  final List<OrderItem> _orders = [
-    OrderItem(
-      id: 'o1',
-      amount: 59.98,
-      products: [
-        CartItem(
-          id: 'c1',
-          title: 'Red Shirt',
-          imageUrl:
-              'https://cdn.pixabay.com/photo/2016/10/02/22/17/red-t-shirt-1710578_1280.jpg',
-          price: 29.99,
-          quantity: 2,
-        )
-      ],
-      dateTime: DateTime.now(),
-    ),
-  ];
+  final OrdersService _ordersService = OrdersService();
+
+  List<OrderItem> _orders = [];
+  bool _isLoading = false;
 
   int get orderCount {
     return _orders.length;
+  }
+
+  bool get isLoading {
+    return _isLoading;
   }
 
   List<OrderItem> get orders {
     return [..._orders];
   }
 
-  void addOrder(List<CartItem> cartProducts, double total) {
-    _orders.insert(
-      0,
-      OrderItem(
-        id: 'o${DateTime.now().toIso8601String()}',
-        amount: total,
-        products: cartProducts,
-        dateTime: DateTime.now(),
-      ),
-    );
+  // Gọi khi vào màn hình Orders, hoặc sau khi login/logout
+  Future<void> fetchOrders() async {
+    _isLoading = true;
     notifyListeners();
+
+    try {
+      _orders = await _ordersService.fetchOrders();
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> addOrder(List<CartItem> cartProducts, double total) async {
+    final newOrder = await _ordersService.addOrder(cartProducts, total);
+    _orders.insert(0, newOrder);
+    notifyListeners();
+  }
+
+  // Gọi khi logout để không giữ order của user cũ trong RAM
+  void clear() {
+    _orders = [];
+    notifyListeners();
+  }
+
+  String? _lastUserId;
+
+  // Dùng bởi ProxyProvider: chỉ load lại khi user thực sự đổi
+  void onAuthUserChanged(String? userId, bool isAuth) {
+    if (_lastUserId == userId) return;
+    _lastUserId = userId;
+
+    if (isAuth) {
+      fetchOrders();
+    } else {
+      clear();
+    }
   }
 }
