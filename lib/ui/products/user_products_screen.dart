@@ -5,8 +5,21 @@ import 'user_product_list_tile.dart';
 import 'products_manager.dart';
 import 'package:go_router/go_router.dart';
 
-class UserProductsScreen extends StatelessWidget {
+class UserProductsScreen extends StatefulWidget {
   const UserProductsScreen({super.key});
+
+  @override
+  State<UserProductsScreen> createState() => _UserProductsScreenState();
+}
+
+class _UserProductsScreenState extends State<UserProductsScreen> {
+  late Future<void> _fetchUserProducts;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserProducts = context.read<ProductsManager>().fetchUserProducts();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +35,21 @@ class UserProductsScreen extends StatelessWidget {
         ],
       ),
       drawer: const AppDrawer(),
-      body: const UserProductList(),
+      body: FutureBuilder(
+        future: _fetchUserProducts,
+        builder: (ctx, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+          return RefreshIndicator(
+            onRefresh: () =>
+                context.read<ProductsManager>().fetchUserProducts(),
+            child: const UserProductList(),
+          );
+        },
+      ),
     );
   }
 }
@@ -33,7 +60,7 @@ class UserProductList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<ProductsManager>(
-      builder: (_, productsManager, _) {
+      builder: (_, productsManager, __) {
         return ListView.builder(
           itemCount: productsManager.itemCount,
           itemBuilder: (_, i) => Column(

@@ -49,4 +49,17 @@ class ProductsManager with ChangeNotifier {
       notifyListeners();
     }
   }
+Future<void> fetchProducts() async {
+    _items = await _productsService.fetchProducts();
+    notifyListeners();
+  }
+
+  Future<void> fetchUserProducts() async {
+    _items = await _productsService.fetchProducts(
+      filteredByUser: true,
+    );
+    notifyListeners();
+  }
 }
+
+
